@@ -17,16 +17,15 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        // Get extension (e.g., pdf, jpg) without the dot
-        const fileExt = path.extname(file.originalname).toLowerCase().substring(1);
+        const fileExt = path.extname(file.originalname).toLowerCase();
         
         return {
             folder: 'scholarpulse/uploads',
-            resource_type: 'auto',
-            // Use only the filename without extension for public_id
-            // Cloudinary will automatically add the correct extension based on 'format'
-            public_id: path.parse(file.originalname).name + '-' + Date.now(),
-            format: fileExt || undefined,
+            // Using 'raw' ensures the URL will have /raw/upload/ instead of /image/upload/
+            resource_type: 'raw',
+            // For 'raw' files, we must manually include the extension in public_id
+            public_id: path.parse(file.originalname).name + '-' + Date.now() + fileExt,
+            access_mode: 'public',
         };
     },
 });

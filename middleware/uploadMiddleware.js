@@ -13,25 +13,15 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Set up Cloudinary storage
+// Set up Cloudinary storage using standard auto-detection
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: async (req, file) => {
-        // Get extension from original name to be safe
-        const originalName = file.originalname;
-        const fileExt = path.extname(originalName).toLowerCase();
-        
-        let folder = 'scholarpulse/others';
-        if (fileExt === '.pdf') folder = 'scholarpulse/documents';
-        else if (['.jpg', '.jpeg', '.png', '.gif'].includes(fileExt)) folder = 'scholarpulse/images';
-
-        return {
-            folder: folder,
-            resource_type: 'raw', // Use raw to keep the exact file content
-            // Force the public_id to include the original filename with extension
-            public_id: `${Date.now()}-${originalName}`,
-        };
-    },
+    params: {
+        folder: 'scholarpulse/uploads',
+        resource_type: 'auto',
+        use_filename: true, 
+        unique_filename: true,
+    }
 });
 
 // Init upload

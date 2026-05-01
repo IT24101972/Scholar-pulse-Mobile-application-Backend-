@@ -13,11 +13,14 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Set up Cloudinary storage with dynamic folder selection
+// Set up Cloudinary storage with fix for double encoding
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        const fileExt = path.extname(file.originalname).toLowerCase();
+        // Decode the filename in case it's already encoded by the mobile app
+        const decodedName = decodeURIComponent(file.originalname);
+        const fileExt = path.extname(decodedName).toLowerCase();
+        const fileNameOnly = path.parse(decodedName).name.replace(/[^a-zA-Z0-9]/g, '_'); // Replace spaces/special chars with underscores
         
         let folder = 'scholarpulse/others';
         if (fileExt === '.pdf') {
@@ -28,9 +31,9 @@ const storage = new CloudinaryStorage({
 
         return {
             folder: folder,
-            resource_type: 'auto', // Let Cloudinary handle the headers correctly
-            // We use the original filename to keep things clear
-            public_id: path.parse(file.originalname).name + '-' + Date.now(),
+            resource_type: 'auto',
+            // Use a sanitized public_id to avoid encoding issues
+            public_id: fileNameOnly + '-' + Date.now(),
         };
     },
 });

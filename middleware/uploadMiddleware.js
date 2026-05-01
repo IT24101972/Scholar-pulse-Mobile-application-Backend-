@@ -29,7 +29,7 @@ const storage = new CloudinaryStorage({
             resource_type = 'image';
         } else if (isPdf) {
             folder = 'scholarpulse/documents';
-            resource_type = 'raw'; // PDF files are best handled as 'raw' in Cloudinary to keep original format
+            resource_type = 'image'; // Using 'image' for PDFs allows better browser viewing in Cloudinary
         } else if (file.mimetype.startsWith('video/')) {
             folder = 'scholarpulse/videos';
             resource_type = 'video';
@@ -39,7 +39,7 @@ const storage = new CloudinaryStorage({
             folder: folder,
             resource_type: resource_type,
             public_id: file.fieldname + '-' + Date.now(),
-            format: isImage ? fileExt : undefined // Only force format for images
+            format: isImage || isPdf ? fileExt : undefined // Force PDF format for PDFs too
         };
     },
 });

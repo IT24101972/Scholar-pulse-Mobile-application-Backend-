@@ -13,15 +13,21 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Set up Cloudinary storage using standard auto-detection
+// Set up Cloudinary storage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'scholarpulse/uploads',
-        resource_type: 'auto',
-        use_filename: true, 
-        unique_filename: true,
-    }
+    params: async (req, file) => {
+        // Get the original extension (e.g., .pdf, .jpg)
+        const fileExt = path.extname(file.originalname).toLowerCase();
+        
+        return {
+            folder: 'scholarpulse/uploads',
+            resource_type: 'auto',
+            // Manually build the public_id to include the extension
+            // This is the most reliable way to ensure the URL ends with .pdf
+            public_id: path.parse(file.originalname).name + '-' + Date.now() + fileExt,
+        };
+    },
 });
 
 // Init upload

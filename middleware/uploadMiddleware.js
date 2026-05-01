@@ -17,19 +17,19 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        const fileExt = path.extname(file.originalname).toLowerCase(); // includes the dot (e.g., .pdf)
-        const isImage = ['.jpg', '.jpeg', '.png', '.gif'].includes(fileExt);
+        // Get extension from original name to be safe
+        const originalName = file.originalname;
+        const fileExt = path.extname(originalName).toLowerCase();
         
         let folder = 'scholarpulse/others';
-        if (isImage) folder = 'scholarpulse/images';
-        else if (fileExt === '.pdf') folder = 'scholarpulse/documents';
-        else if (file.mimetype.startsWith('video/')) folder = 'scholarpulse/videos';
+        if (fileExt === '.pdf') folder = 'scholarpulse/documents';
+        else if (['.jpg', '.jpeg', '.png', '.gif'].includes(fileExt)) folder = 'scholarpulse/images';
 
         return {
             folder: folder,
-            resource_type: 'auto', // Most flexible option
-            // We append the extension to the public_id to ensure it's in the URL
-            public_id: path.parse(file.originalname).name + '-' + Date.now() + fileExt,
+            resource_type: 'raw', // Use raw to keep the exact file content
+            // Force the public_id to include the original filename with extension
+            public_id: `${Date.now()}-${originalName}`,
         };
     },
 });

@@ -17,29 +17,19 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        const fileExt = path.extname(file.originalname).toLowerCase().substring(1);
-        const isPdf = fileExt === 'pdf';
-        const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExt);
+        const fileExt = path.extname(file.originalname).toLowerCase(); // includes the dot (e.g., .pdf)
+        const isImage = ['.jpg', '.jpeg', '.png', '.gif'].includes(fileExt);
         
         let folder = 'scholarpulse/others';
-        let resource_type = 'auto';
-
-        if (isImage) {
-            folder = 'scholarpulse/images';
-            resource_type = 'image';
-        } else if (isPdf) {
-            folder = 'scholarpulse/documents';
-            resource_type = 'image'; // Using 'image' for PDFs allows better browser viewing in Cloudinary
-        } else if (file.mimetype.startsWith('video/')) {
-            folder = 'scholarpulse/videos';
-            resource_type = 'video';
-        }
+        if (isImage) folder = 'scholarpulse/images';
+        else if (fileExt === '.pdf') folder = 'scholarpulse/documents';
+        else if (file.mimetype.startsWith('video/')) folder = 'scholarpulse/videos';
 
         return {
             folder: folder,
-            resource_type: resource_type,
-            public_id: file.fieldname + '-' + Date.now(),
-            format: isImage || isPdf ? fileExt : undefined // Force PDF format for PDFs too
+            resource_type: 'auto', // Most flexible option
+            // We append the extension to the public_id to ensure it's in the URL
+            public_id: path.parse(file.originalname).name + '-' + Date.now() + fileExt,
         };
     },
 });

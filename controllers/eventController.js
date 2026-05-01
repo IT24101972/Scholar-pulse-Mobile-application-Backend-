@@ -53,10 +53,10 @@ exports.createEvent = async (req, res) => {
         // Handle Files (Multer fields puts them in req.files)
         if (req.files) {
             if (req.files.image && req.files.image[0]) {
-                eventData.image = req.files.image[0].path;
+                eventData.image = `/uploads/${req.files.image[0].filename}`;
             }
             if (req.files.video && req.files.video[0]) {
-                eventData.video = req.files.video[0].path;
+                eventData.video = `/uploads/${req.files.video[0].filename}`;
             }
         }
 
@@ -153,10 +153,10 @@ exports.updateEvent = async (req, res) => {
         // Handle Files
         if (req.files) {
             if (req.files.image && req.files.image[0]) {
-                updateData.image = req.files.image[0].path;
+                updateData.image = `/uploads/${req.files.image[0].filename}`;
             }
             if (req.files.video && req.files.video[0]) {
-                updateData.video = req.files.video[0].path;
+                updateData.video = `/uploads/${req.files.video[0].filename}`;
             }
         }
 

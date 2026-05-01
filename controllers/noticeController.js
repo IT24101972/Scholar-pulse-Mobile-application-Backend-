@@ -49,10 +49,10 @@ exports.createNotice = async (req, res) => {
         // Handle file uploads
         if (req.files) {
             if (req.files.image && req.files.image[0]) {
-                noticeData.image = req.files.image[0].path;
+                noticeData.image = `/uploads/${req.files.image[0].filename}`;
             }
             if (req.files.attachment && req.files.attachment[0]) {
-                noticeData.attachment = req.files.attachment[0].path;
+                noticeData.attachment = `/uploads/${req.files.attachment[0].filename}`;
             }
         }
 
@@ -106,10 +106,10 @@ exports.updateNotice = async (req, res) => {
 
         if (req.files) {
             if (req.files.image && req.files.image[0]) {
-                updateData.image = req.files.image[0].path;
+                updateData.image = `/uploads/${req.files.image[0].filename}`;
             }
             if (req.files.attachment && req.files.attachment[0]) {
-                updateData.attachment = req.files.attachment[0].path;
+                updateData.attachment = `/uploads/${req.files.attachment[0].filename}`;
             }
         }
 

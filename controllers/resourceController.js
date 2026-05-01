@@ -64,7 +64,7 @@ exports.createResource = async (req, res) => {
         // If a file was uploaded, extract metadata
         if (req.file) {
             req.body.name = req.file.originalname;
-            req.body.url = req.file.path;
+            req.body.url = `/uploads/${req.file.filename}`;
 
             // Format size
             const sizeInBytes = req.file.size;
@@ -72,12 +72,10 @@ exports.createResource = async (req, res) => {
             else if (sizeInBytes < 1024 * 1024) req.body.size = (sizeInBytes / 1024).toFixed(1) + ' KB';
             else req.body.size = (sizeInBytes / (1024 * 1024)).toFixed(1) + ' MB';
 
-            // Determine type correctly from original filename
-            const originalName = req.file.originalname || '';
-            const ext = originalName.includes('.') ? originalName.split('.').pop().toLowerCase() : '';
-            
+            // Determine type
+            const ext = req.file.originalname.split('.').pop().toLowerCase();
             if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) req.body.type = 'image';
-            else if (ext === 'pdf') req.body.type = 'pdf';
+            else if (['pdf'].includes(ext)) req.body.type = 'pdf';
             else if (['doc', 'docx'].includes(ext)) req.body.type = 'doc';
             else req.body.type = 'other';
         }

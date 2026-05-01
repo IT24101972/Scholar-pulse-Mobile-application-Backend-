@@ -13,20 +13,12 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Set up Cloudinary storage
+// Set up standard Cloudinary storage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: async (req, file) => {
-        const fileExt = path.extname(file.originalname).toLowerCase();
-        
-        return {
-            folder: 'scholarpulse/uploads',
-            // Using 'raw' ensures the URL will have /raw/upload/ instead of /image/upload/
-            resource_type: 'raw',
-            // For 'raw' files, we must manually include the extension in public_id
-            public_id: path.parse(file.originalname).name + '-' + Date.now() + fileExt,
-            access_mode: 'public',
-        };
+    params: {
+        folder: 'scholarpulse/uploads',
+        resource_type: 'auto',
     },
 });
 

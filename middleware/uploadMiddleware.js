@@ -17,22 +17,29 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        const fileType = file.mimetype.split('/')[0]; // image, video, application
+        const fileExt = path.extname(file.originalname).toLowerCase().substring(1);
+        const isPdf = fileExt === 'pdf';
+        const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExt);
+        
         let folder = 'scholarpulse/others';
         let resource_type = 'auto';
 
-        if (fileType === 'image') folder = 'scholarpulse/images';
-        else if (fileType === 'video') {
+        if (isImage) {
+            folder = 'scholarpulse/images';
+            resource_type = 'image';
+        } else if (isPdf) {
+            folder = 'scholarpulse/documents';
+            resource_type = 'raw'; // PDF files are best handled as 'raw' in Cloudinary to keep original format
+        } else if (file.mimetype.startsWith('video/')) {
             folder = 'scholarpulse/videos';
             resource_type = 'video';
         }
-        else if (file.mimetype === 'application/pdf') folder = 'scholarpulse/documents';
 
         return {
             folder: folder,
             resource_type: resource_type,
             public_id: file.fieldname + '-' + Date.now(),
-            format: path.extname(file.originalname).substring(1) || undefined
+            format: isImage ? fileExt : undefined // Only force format for images
         };
     },
 });

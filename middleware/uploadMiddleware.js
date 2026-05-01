@@ -17,15 +17,16 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        // Get the original extension (e.g., .pdf, .jpg)
-        const fileExt = path.extname(file.originalname).toLowerCase();
+        // Get extension (e.g., pdf, jpg) without the dot
+        const fileExt = path.extname(file.originalname).toLowerCase().substring(1);
         
         return {
             folder: 'scholarpulse/uploads',
             resource_type: 'auto',
-            // Manually build the public_id to include the extension
-            // This is the most reliable way to ensure the URL ends with .pdf
-            public_id: path.parse(file.originalname).name + '-' + Date.now() + fileExt,
+            // Use only the filename without extension for public_id
+            // Cloudinary will automatically add the correct extension based on 'format'
+            public_id: path.parse(file.originalname).name + '-' + Date.now(),
+            format: fileExt || undefined,
         };
     },
 });

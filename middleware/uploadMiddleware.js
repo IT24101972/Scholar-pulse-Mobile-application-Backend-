@@ -13,12 +13,25 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Set up standard Cloudinary storage
+// Set up Cloudinary storage with dynamic folder selection
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'scholarpulse/uploads',
-        resource_type: 'auto',
+    params: async (req, file) => {
+        const fileExt = path.extname(file.originalname).toLowerCase();
+        
+        let folder = 'scholarpulse/others';
+        if (fileExt === '.pdf') {
+            folder = 'scholarpulse/documents';
+        } else if (['.jpg', '.jpeg', '.png', '.gif'].includes(fileExt)) {
+            folder = 'scholarpulse/images';
+        }
+
+        return {
+            folder: folder,
+            resource_type: 'auto', // Let Cloudinary handle the headers correctly
+            // We use the original filename to keep things clear
+            public_id: path.parse(file.originalname).name + '-' + Date.now(),
+        };
     },
 });
 
